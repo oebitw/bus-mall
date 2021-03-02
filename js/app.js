@@ -314,7 +314,14 @@ function results() {
     }
   } );
 
-
+  const parentElement = document.getElementById( 'results' );
+  const ulElement = document.createElement( 'ul' );
+  parentElement.appendChild( ulElement );
+  for ( let i =0; i < Products.all.length; i++ ){
+    const liElement = document.createElement( 'li' );
+    ulElement.appendChild( liElement );
+    liElement.textContent = `${Products.all[i].name} VOTES: ${Products.all[i].clicks}, VIEWS: ${Products.all[i].shown}  times.`;
+  }
 
 
 }
