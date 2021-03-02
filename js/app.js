@@ -2,55 +2,61 @@
 // Helper function ....................................................
 
 function randomNumber( min, max ) {
-  return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+  let index2 = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+  for ( let i = 0; i < index.length; i++ ) {
+    if ( index2 === index[i] ) {
+      index2 = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+    }
+  } return ( index2 );
+
 }
 
 // Global Variables...................................................
 
 let leftProductsIndex = 0;
-let centeredProductsIndex= 0;
+let centeredProductsIndex = 0;
 let rightProductsIndex = 0;
 
-let currentIndex = [];
+let index = [];
 
 
 
 const clickCounter = 24;
 
 const allProducts = document.getElementById( 'allProducts' );
-const left= document.getElementById( 'left' );
-const center= document.getElementById( 'center' );
-const right= document.getElementById( 'right' );
+const left = document.getElementById( 'left' );
+const center = document.getElementById( 'center' );
+const right = document.getElementById( 'right' );
 
 
 let nameArr = [
 
-  'bag',
-  'banana',
-  'bathroom',
-  'boots',
-  'breakfast',
-  'bubblegum',
-  'chair',
-  'cthulhu',
-  'dog-duck',
-  'dragon',
-  'pen',
-  'pet-sweep',
-  'scissors',
-  'shark',
-  'sweep',
-  'tauntaun',
-  'unicorn',
-  'usb',
-  'water-can',
-  'wine-glass'
+  'Bag',
+  'Banana',
+  'Bathroom',
+  'Boots',
+  'Breakfast',
+  'Bubblegum',
+  'Chair',
+  'Cthulhu',
+  'Dog-duck',
+  'Dragon',
+  'Pen',
+  'Pet-sweep',
+  'Scissors',
+  'Shark',
+  'Sweep',
+  'Tauntaun',
+  'Unicorn',
+  'Usb',
+  'Water-can',
+  'Wine-glass'
 
 
 
 ];
 
-let pathArr= [
+let pathArr = [
   'bag.jpg',
   'banana.jpg',
   'bathroom.jpg',
@@ -80,61 +86,63 @@ let pathArr= [
 
 // Products object........................................................................
 
-function Products ( name , path ) {
+function Products( name, path ) {
 
-  this.name= name;
-  this.path= path;
-  this.image=`./img/${path}`;
-  this.clicks=0;
-  this.shown=0;
+  this.name = name;
+  this.path = path;
+  this.image = `./img/${path}`;
+  this.clicks = 0;
+  this.shown = 0;
 
   Products.all.push( this );
 
 
-}
-Products.all=[];
-Products.counter=0;
 
-for( let i=0; i<nameArr.length; i++ ){
+}
+Products.all = [];
+Products.counter = 0;
+
+for ( let i = 0; i < nameArr.length; i++ ) {
   new Products( nameArr[i], pathArr[i] );
 }
 
 // ..........................Render Function..........................................
 
+
 function renderProducts() {
 
-  let prevIndex = currentIndex;
+
+  let leftIndex = randomNumber( 0, Products.all.length - 1 );
+  left.src = Products.all[leftIndex].image;
+  left.alt = Products.all[leftIndex].name;
+  leftProductsIndex = leftIndex;
+  index.push( leftIndex );
+
+  let rightIndex;
   do {
-    let nextIndex = [];
-    currentIndex= nextIndex;
-    let leftIndex = randomNumber( 0, Products.all.length - 1 );
-    left.src = Products.all[leftIndex].image;
-    left.alt = Products.all[leftIndex].name;
-    leftProductsIndex = leftIndex;
+    rightIndex = randomNumber( 0, Products.all.length - 1 );
+  } while ( leftIndex === rightIndex );
 
-    let rightIndex;
-    do {
-      rightIndex = randomNumber( 0, Products.all.length - 1 );
-    } while( leftIndex === rightIndex );
+  right.src = Products.all[rightIndex].image;
+  right.alt = Products.all[rightIndex].name;
+  rightProductsIndex = rightIndex;
+  index.push( rightIndex );
 
-    right.src = Products.all[rightIndex].image;
-    right.alt = Products.all[rightIndex].name;
-    rightProductsIndex = rightIndex;
+  let centeredIndex;
+  do {
+    centeredIndex = randomNumber( 0, Products.all.length - 1 );
+  } while ( centeredIndex === rightIndex || centeredIndex === leftIndex );
 
-    let centeredIndex;
-    do {
-      centeredIndex = randomNumber( 0, Products.all.length - 1 );
-    } while( centeredIndex === rightIndex || centeredIndex=== leftIndex );
+  center.src = Products.all[centeredIndex].image;
+  center.alt = Products.all[centeredIndex].name;
+  centeredProductsIndex = centeredIndex;
+  index.push( centeredIndex );
 
-    center.src = Products.all[centeredIndex].image;
-    center.alt = Products.all[centeredIndex].name;
-    centeredProductsIndex = centeredIndex;
+  Products.all[leftIndex].shown++;
+  Products.all[centeredIndex].shown++;
+  Products.all[rightIndex].shown++;
 
-    Products.all[leftIndex].shown++;
-    Products.all[centeredIndex].shown++;
-    Products.all[rightIndex].shown++;
-    currentIndex.push( leftIndex,centeredIndex,rightIndex );
-  } while ( currentIndex.includes( prevIndex[0] ) || currentIndex.includes( prevIndex[1] ) || currentIndex.includes( prevIndex[2] ) );
+  localStorage.setItem( 'Products', JSON.stringify( Products.all ) );
 
 }
 
@@ -142,8 +150,7 @@ function renderProducts() {
 // Handel Click and Results ....................................................................
 
 let button = document.getElementById( 'button' );
-button.style.visibility='hidden';
-
+button.style.visibility = 'hidden';
 
 
 function handelClick( event ) {
@@ -165,7 +172,7 @@ function handelClick( event ) {
     }
 
   } else {
-    button.style.visibility='visible';
+    button.style.visibility = 'visible';
   }
 }
 
@@ -175,8 +182,8 @@ function results() {
   let clicksArray = [];
   let shownArray = [];
 
-  for( let i = 0; i < Products.all.length; i++ ) {
-    nameArray.push ( Products.all[i].name );
+  for ( let i = 0; i < Products.all.length; i++ ) {
+    nameArray.push( Products.all[i].name );
     clicksArray.push( Products.all[i].clicks );
     shownArray.push( Products.all[i].shown );
 
@@ -247,9 +254,10 @@ function results() {
         borderWidth: 1
 
       },
-      { label: '# Shown',
+      {
+        label: '# Shown',
         data: shownArray,
-        backgroundColor:[
+        backgroundColor: [
 
           'rgba(255, 0, 0, 0.2)',
           'rgba(255, 0, 0, 0.2)',
@@ -295,7 +303,7 @@ function results() {
           'rgba(255, 0, 0, 1)',
           'rgba(255, 0, 0, 1)',
           'rgba(255, 0, 0, 1)',
-          'rgba(255, 0, 0, 1)',
+          'rgba(255, 0, 0, 1)'
 
 
         ],
@@ -317,7 +325,7 @@ function results() {
   const parentElement = document.getElementById( 'results' );
   const ulElement = document.createElement( 'ul' );
   parentElement.appendChild( ulElement );
-  for ( let i =0; i < Products.all.length; i++ ){
+  for ( let i = 0; i < Products.all.length; i++ ) {
     const liElement = document.createElement( 'li' );
     ulElement.appendChild( liElement );
     liElement.textContent = `${Products.all[i].name} VOTES: ${Products.all[i].clicks}, VIEWS: ${Products.all[i].shown}  times.`;
@@ -326,12 +334,23 @@ function results() {
 
 }
 
+function getData() {
+
+  const data = localStorage.getItem( 'Products' );
+  if ( data ) {
+
+    const objData = JSON.parse( data );
+    Products.all = objData;
+
+    renderProducts();
+
+  }
+}
+
+getData();
 
 button.addEventListener( 'click', results );
 
 allProducts.addEventListener( 'click', handelClick );
 
 renderProducts();
-
-
-
